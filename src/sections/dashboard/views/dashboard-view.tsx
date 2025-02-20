@@ -21,18 +21,22 @@ import {
 import { Rowdies } from "next/font/google";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Charts from "../Chart";
+import { shadows } from "../../../theme/shadows";
 
 export default function DashboardView() {
   const auth = useAuth();
   console.log(auth);
   const [summary, setSummary] = useState<any>("");
   const [summaryFilter, setSummaryFilter] = useState<any>("this-week");
+  const [chartData, setChartData] = useState<any>("");
 
   const getSummaryData = async () => {
     if (auth.token !== "") {
       try {
         const res = await fetch(
-          "https://dummy-1.hiublue.com/api/dashboard/summary",
+          "https://dummy-1.hiublue.com/api/dashboard/summary" +
+            "?filter=this-week",
           {
             method: "GET",
             headers: {
@@ -49,6 +53,34 @@ export default function DashboardView() {
         const data = await res.json();
         console.log(data);
         setSummary(data);
+        return data;
+      } catch (error) {
+        console.error("Error fetching summary data:", error);
+      }
+    }
+  };
+
+  const getChartData = async () => {
+    if (auth.token !== "") {
+      try {
+        const res = await fetch(
+          "https://dummy-1.hiublue.com/api/dashboard/stat?filter=this-week",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${auth.token}`, // Pass token in headers
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch summary data");
+        }
+
+        const data = await res.json();
+        console.log(data);
+        setChartData(data);
         return data;
       } catch (error) {
         console.error("Error fetching summary data:", error);
@@ -74,6 +106,7 @@ export default function DashboardView() {
 
   useEffect(() => {
     getSummaryData();
+    getChartData();
   }, [auth]);
 
   return (
@@ -103,6 +136,7 @@ export default function DashboardView() {
                 flex: 1,
                 padding: "card/content-p",
                 borderRadius: "card/radius",
+                shadows: "card",
               }}
             >
               <CardContent>
@@ -239,6 +273,7 @@ export default function DashboardView() {
           </Stack>
         </Box>
       </Box>
+      {chartData && <Charts apiResponse={chartData} />}
     </>
   );
 }
