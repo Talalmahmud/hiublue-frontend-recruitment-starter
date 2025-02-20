@@ -18,19 +18,22 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Rowdies } from "next/font/google";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Charts from "../Chart";
-import { shadows } from "../../../theme/shadows";
 import OfferList from "../UserTable";
+import { useRouter } from "next/navigation";
 
 export default function DashboardView() {
   const auth = useAuth();
-  console.log(auth);
+  const router = useRouter();
   const [summary, setSummary] = useState<any>("");
   const [summaryFilter, setSummaryFilter] = useState<any>("this-week");
   const [chartData, setChartData] = useState<any>("");
+  const [offerList, setOfferList] = useState<any>([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [total, setTotal] = useState(1);
 
   const getSummaryData = async () => {
     if (auth.token !== "") {
@@ -89,6 +92,36 @@ export default function DashboardView() {
     }
   };
 
+  const getOfferList = async () => {
+    if (auth.token !== "") {
+      try {
+        const res = await fetch(
+          "https://dummy-1.hiublue.com/api/offers" +
+            `?page=${page}&per_page=${rowsPerPage}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${auth.token}`, // Pass token in headers
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch summary data");
+        }
+
+        const data = await res.json();
+        console.log(data);
+        setOfferList(data?.data);
+        setTotal(data?.meta?.total);
+        return data;
+      } catch (error) {
+        console.error("Error fetching summary data:", error);
+      }
+    }
+  };
+
   const formatNumber = (num: number): string => {
     if (typeof num === "number") {
       if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + "B"; // Billion
@@ -106,9 +139,22 @@ export default function DashboardView() {
   };
 
   useEffect(() => {
+    getOfferList();
+  }, [auth, page, rowsPerPage]);
+
+  useEffect(() => {
     getSummaryData();
     getChartData();
+    getOfferList();
   }, [auth]);
+
+  // useEffect(() => {
+  //   if (auth.token !== "") {
+  //     router.push("/login");
+  //   } else {
+  //     return;
+  //   }
+  // }, []);
 
   return (
     <>
@@ -276,7 +322,16 @@ export default function DashboardView() {
       </Box>
       {chartData && <Charts apiResponse={chartData} />}
 
-      <OfferList />
+      {offerList.length > 0 && (
+        <OfferList
+          page={page}
+          setPage={setPage}
+          setRowsPerPage={setRowsPerPage}
+          rowsPerPage={rowsPerPage}
+          rows={offerList}
+          total={total}
+        />
+      )}
     </>
   );
 }

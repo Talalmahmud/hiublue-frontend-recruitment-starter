@@ -15,67 +15,80 @@ import {
   Typography,
   Tabs,
   Tab,
+  TablePagination,
+  Stack,
 } from "@mui/material";
+import Image from "next/image";
 
 // Sample data for the table
-const rows = [
-  {
-    name: "Jayvion Simon",
-    email: "namie.abernathy70@yahoo.com",
-    phone: "365-374-4961",
-    company: "Lueliwitz and Sons",
-    jobTitle: "CEO",
-    type: "Monthly",
-    status: "Accepted",
-  },
-  {
-    name: "Jayvion Simon",
-    email: "namie.abernathy70@yahoo.com",
-    phone: "365-374-4961",
-    company: "Lueliwitz and Sons",
-    jobTitle: "CEO",
-    type: "Yearly",
-    status: "Rejected",
-  },
-  {
-    name: "Jayvion Simon",
-    email: "namie.abernathy70@yahoo.com",
-    phone: "365-374-4961",
-    company: "Lueliwitz and Sons",
-    jobTitle: "CEO",
-    type: "Monthly",
-    status: "Pending",
-  },
-  {
-    name: "Jayvion Simon",
-    email: "namie.abernathy70@yahoo.com",
-    phone: "365-374-4961",
-    company: "Lueliwitz and Sons",
-    jobTitle: "CEO",
-    type: "Pay As You Go",
-    status: "Accepted",
-  },
-  {
-    name: "Jayvion Simon",
-    email: "namie.abernathy70@yahoo.com",
-    phone: "365-374-4961",
-    company: "Lueliwitz and Sons",
-    jobTitle: "CEO",
-    type: "Monthly",
-    status: "Accepted",
-  },
-];
+// const rows = [
+//   {
+//     name: "Jayvion Simon",
+//     email: "namie.abernathy70@yahoo.com",
+//     phone: "365-374-4961",
+//     company: "Lueliwitz and Sons",
+//     jobTitle: "CEO",
+//     type: "Monthly",
+//     status: "Accepted",
+//   },
+//   {
+//     name: "Jayvion Simon",
+//     email: "namie.abernathy70@yahoo.com",
+//     phone: "365-374-4961",
+//     company: "Lueliwitz and Sons",
+//     jobTitle: "CEO",
+//     type: "Yearly",
+//     status: "Rejected",
+//   },
+//   {
+//     name: "Jayvion Simon",
+//     email: "namie.abernathy70@yahoo.com",
+//     phone: "365-374-4961",
+//     company: "Lueliwitz and Sons",
+//     jobTitle: "CEO",
+//     type: "Monthly",
+//     status: "Pending",
+//   },
+//   {
+//     name: "Jayvion Simon",
+//     email: "namie.abernathy70@yahoo.com",
+//     phone: "365-374-4961",
+//     company: "Lueliwitz and Sons",
+//     jobTitle: "CEO",
+//     type: "Pay As You Go",
+//     status: "Accepted",
+//   },
+//   {
+//     name: "Jayvion Simon",
+//     email: "namie.abernathy70@yahoo.com",
+//     phone: "365-374-4961",
+//     company: "Lueliwitz and Sons",
+//     jobTitle: "CEO",
+//     type: "Monthly",
+//     status: "Accepted",
+//   },
+// ];
+type Props = {
+  rows: any;
+  rowsPerPage: any;
+  setRowsPerPage: any;
+  page: any;
+  setPage: any;
+  total: number | 0;
+};
 
-const OfferList = () => {
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+const OfferList = ({
+  rows,
+  rowsPerPage,
+  setRowsPerPage,
+  page,
+  setPage,
+  total,
+}: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [tabValue, setTabValue] = useState("all"); // State for tab value
 
   // Handle pagination change
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
 
   // Handle search input change
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,15 +103,27 @@ const OfferList = () => {
 
   // Filter rows based on search term and tab value
   const filteredRows = rows
-    .filter((row) => row.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .filter((row) => tabValue === "all" || row.status === "Accepted");
+    ?.filter((row: any) =>
+      row?.user_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    ?.filter((row: any) => tabValue === "all" || row.status === "Accepted");
 
   // Paginate rows
-  const paginatedRows = filteredRows.slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
-  );
+  //   const rows = filteredRows?.slice(
+  //     (page) * rowsPerPage,
+  //     page * rowsPerPage
+  //   );
 
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(page);
+  };
   return (
     <Box sx={{ padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
@@ -136,12 +161,13 @@ const OfferList = () => {
               <TableCell>Job Title</TableCell>
               <TableCell>Type</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedRows.map((row, index) => (
+            {rows.map((row: any, index: number) => (
               <TableRow key={index}>
-                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.user_name}</TableCell>
                 <TableCell>{row.phone}</TableCell>
                 <TableCell>{row.company}</TableCell>
                 <TableCell>{row.jobTitle}</TableCell>
@@ -160,6 +186,19 @@ const OfferList = () => {
                     {row.status}
                   </Typography>
                 </TableCell>
+                <TableCell>
+                  <Stack direction="row" gap={2}>
+                    {" "}
+                    {/* Use "row" as a string */}
+                    <Image src={"/pen.svg"} height={20} width={20} alt="Edit" />
+                    <Image
+                      src={"/dot.svg"}
+                      height={20}
+                      width={20}
+                      alt="Options"
+                    />
+                  </Stack>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -167,26 +206,15 @@ const OfferList = () => {
       </TableContainer>
 
       {/* Pagination */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: "20px",
-        }}
-      >
-        <Typography variant="body2">Rows per page: {rowsPerPage}</Typography>
-        <Pagination
-          count={Math.ceil(filteredRows.length / rowsPerPage)}
-          page={page}
-          onChange={handleChangePage}
-        />
-        <Typography variant="body2">
-          {`${(page - 1) * rowsPerPage + 1}-${Math.min(
-            page * rowsPerPage,
-            filteredRows.length
-          )} of ${filteredRows.length}`}
-        </Typography>
-      </Box>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={total}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </Box>
   );
 };

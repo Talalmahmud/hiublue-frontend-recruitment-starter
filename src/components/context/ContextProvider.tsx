@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // Add usePathname
 import React, {
   createContext,
   useState,
@@ -22,6 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: Children) => {
   const router = useRouter();
+  const pathname = usePathname(); // Get the current route
   const [token, setToken] = useState<string | null>(null); // Use null to track initialization state
 
   useEffect(() => {
@@ -41,12 +42,18 @@ export const AuthProvider = ({ children }: Children) => {
   useEffect(() => {
     if (token === null) return; // Prevent redirect before token is initialized
 
-    if (token) {
-      router.push("/");
+    // Define routes that are allowed even when the user is authenticated
+    const allowedRoutes = ["/onboarding", "/login"]; // Add more routes if needed
+
+    if (token !== "") {
+      // If the user is authenticated and tries to access a restricted route, redirect to "/"
+
+      router.push(pathname);
     } else {
+      // If the user is not authenticated, redirect to "/login"
       router.push("/login");
     }
-  }, [token, router]);
+  }, [token, router, pathname]); // Add pathname to the dependency array
 
   const value = useMemo(() => ({ token: token || "", setToken }), [token]);
 
