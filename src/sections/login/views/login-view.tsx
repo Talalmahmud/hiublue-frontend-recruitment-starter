@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -67,9 +67,10 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const { token } = useAuth();
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault(); // Prevent page reload
-   
 
     try {
       const response = await fetch("https://dummy-1.hiublue.com/api/login", {
@@ -94,6 +95,11 @@ export default function SignIn() {
       setError(err.message); // Show error message
     }
   };
+  useEffect(() => {
+    if (token !== "") {
+      router.push("/");
+    }
+  }, []);
 
   return (
     <>
