@@ -57,10 +57,14 @@ export default function DashboardView() {
   };
 
   const formatNumber = (num: number): string => {
-    if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + "B"; // Billion
-    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "M"; // Million
-    if (num >= 1_000) return (num / 1_000).toFixed(1) + "K"; // Thousand
-    return num.toString(); // Less than 1,000 (show raw number)
+    if (typeof num === "number") {
+      if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + "B"; // Billion
+      if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "M"; // Million
+      if (num >= 1_000) return (num / 1_000).toFixed(1) + "K"; // Thousand
+      return num.toString(); // Less than 1,000 (show raw number)
+    } else {
+      return "";
+    }
   };
   const getPercentageChange = (current: number, previous: number) => {
     if (previous === 0) return "N/A"; // Avoid division by zero
