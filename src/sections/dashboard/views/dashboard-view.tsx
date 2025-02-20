@@ -23,6 +23,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Charts from "../Chart";
 import { shadows } from "../../../theme/shadows";
+import OfferList from "../UserTable";
 
 export default function DashboardView() {
   const auth = useAuth();
@@ -274,6 +275,8 @@ export default function DashboardView() {
         </Box>
       </Box>
       {chartData && <Charts apiResponse={chartData} />}
+
+      <OfferList />
     </>
   );
 }
