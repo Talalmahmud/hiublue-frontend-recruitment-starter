@@ -34,13 +34,13 @@ export default function DashboardView() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [total, setTotal] = useState(1);
+  const [weekFilter, setWeekFilter] = useState("this-week");
 
   const getSummaryData = async () => {
     if (auth.token !== "") {
       try {
         const res = await fetch(
-          "https://dummy-1.hiublue.com/api/dashboard/summary" +
-            "?filter=this-week",
+          `https://dummy-1.hiublue.com/api/dashboard/summary?filter=${weekFilter}`,
           {
             method: "GET",
             headers: {
@@ -68,7 +68,7 @@ export default function DashboardView() {
     if (auth.token !== "") {
       try {
         const res = await fetch(
-          "https://dummy-1.hiublue.com/api/dashboard/stat?filter=this-week",
+          `https://dummy-1.hiublue.com/api/dashboard/stat?filter=${weekFilter}`,
           {
             method: "GET",
             headers: {
@@ -146,7 +146,7 @@ export default function DashboardView() {
     getSummaryData();
     getChartData();
     getOfferList();
-  }, [auth]);
+  }, [auth, weekFilter]);
 
   // useEffect(() => {
   //   if (auth.token !== "") {
@@ -169,10 +169,13 @@ export default function DashboardView() {
             Dashboard
           </Typography>
 
-          <Select defaultValue="this-week" size="small">
+          <Select
+            value={weekFilter}
+            onChange={(e) => setWeekFilter(e.target.value)}
+            size="small"
+          >
             <MenuItem value="this-week">This Week</MenuItem>
-            <MenuItem value="option2">Option 2</MenuItem>
-            <MenuItem value="option3">Option 3</MenuItem>
+            <MenuItem value="prev-week">Prev Week</MenuItem>
           </Select>
         </Stack>
 
