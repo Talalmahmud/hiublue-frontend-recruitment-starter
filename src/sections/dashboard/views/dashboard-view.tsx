@@ -34,13 +34,16 @@ export default function DashboardView() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [total, setTotal] = useState(1);
+  const [weekFilter, setWeekFilter] = useState("this-week");
+  const [search, setSearch] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
+  const [searchType, setSearchType] = useState<string>("all");
 
   const getSummaryData = async () => {
     if (auth.token !== "") {
       try {
         const res = await fetch(
-          "https://dummy-1.hiublue.com/api/dashboard/summary" +
-            "?filter=this-week",
+          `https://dummy-1.hiublue.com/api/dashboard/summary?filter=${weekFilter}`,
           {
             method: "GET",
             headers: {
@@ -68,7 +71,7 @@ export default function DashboardView() {
     if (auth.token !== "") {
       try {
         const res = await fetch(
-          "https://dummy-1.hiublue.com/api/dashboard/stat?filter=this-week",
+          `https://dummy-1.hiublue.com/api/dashboard/stat?filter=${weekFilter}`,
           {
             method: "GET",
             headers: {
@@ -97,9 +100,12 @@ export default function DashboardView() {
       try {
         const res = await fetch(
           "https://dummy-1.hiublue.com/api/offers" +
-            `?page=${page}&per_page=${rowsPerPage}`,
+            `?page=${page}&per_page=${rowsPerPage}&search=${search}&status=${
+              status == "all" ? "" : status
+            }&type=${searchType === "all" ? "" : searchType}`,
           {
             method: "GET",
+
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${auth.token}`, // Pass token in headers
@@ -140,13 +146,13 @@ export default function DashboardView() {
 
   useEffect(() => {
     getOfferList();
-  }, [auth, page, rowsPerPage]);
+  }, [auth, page, rowsPerPage, search, searchType, status]);
 
   useEffect(() => {
     getSummaryData();
     getChartData();
     getOfferList();
-  }, [auth]);
+  }, [auth, weekFilter]);
 
   // useEffect(() => {
   //   if (auth.token !== "") {
@@ -158,7 +164,6 @@ export default function DashboardView() {
 
   return (
     <>
-      <GoogleIcon />
       <Box sx={{ flexGrow: 1, padding: 3 }}>
         <Stack
           direction="row"
@@ -169,10 +174,13 @@ export default function DashboardView() {
             Dashboard
           </Typography>
 
-          <Select defaultValue="this-week" size="small">
+          <Select
+            value={weekFilter}
+            onChange={(e) => setWeekFilter(e.target.value)}
+            size="small"
+          >
             <MenuItem value="this-week">This Week</MenuItem>
-            <MenuItem value="option2">Option 2</MenuItem>
-            <MenuItem value="option3">Option 3</MenuItem>
+            <MenuItem value="prev-week">Prev Week</MenuItem>
           </Select>
         </Stack>
 
@@ -324,6 +332,12 @@ export default function DashboardView() {
 
       {offerList.length > 0 && (
         <OfferList
+          search={search}
+          setSearch={setSearch}
+          searchType={searchType}
+          setSearchType={setSearchType}
+          status={status}
+          setStatus={setStatus}
           page={page}
           setPage={setPage}
           setRowsPerPage={setRowsPerPage}

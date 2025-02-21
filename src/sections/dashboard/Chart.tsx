@@ -7,7 +7,6 @@ import { Box, Stack } from "@mui/material";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
-
 type ApiResponse = {
   website_visits: {
     [key: string]: { desktop: number; mobile: number }; // Dynamic keys for days
@@ -55,7 +54,7 @@ const Charts = ({ apiResponse }: Props) => {
       bar: {
         horizontal: false,
         columnWidth: "55%",
-        borderRadius: 12, 
+        borderRadius: 12,
       },
     },
     dataLabels: {
@@ -67,7 +66,7 @@ const Charts = ({ apiResponse }: Props) => {
       colors: ["transparent"],
     },
     xaxis: {
-      categories: categories, 
+      categories: categories,
     },
     yaxis: {
       title: {
@@ -83,14 +82,13 @@ const Charts = ({ apiResponse }: Props) => {
     fill: {
       opacity: 1,
     },
-    colors: ["#3b82f6", "#10b981"], 
+    colors: ["#3b82f6", "#10b981"],
     legend: {
-      position: "top", 
+      position: "top",
       horizontalAlign: "right",
     },
   };
 
- 
   const offersSentOptions: ApexOptions = {
     chart: {
       type: "line",
@@ -110,7 +108,7 @@ const Charts = ({ apiResponse }: Props) => {
         text: "Offers Sent",
       },
     },
-    colors: ["#ef4444"], 
+    colors: ["#ef4444"],
     markers: {
       size: 5,
     },
@@ -120,7 +118,9 @@ const Charts = ({ apiResponse }: Props) => {
     <Stack sx={{ maxWidth: "100%", margin: "0 auto", padding: "20px" }}>
       <Box
         sx={{
-          display: "flex", 
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" }, // Column on small screens, row on medium+
+
           gap: "20px",
         }}
       >
@@ -133,7 +133,6 @@ const Charts = ({ apiResponse }: Props) => {
           }}
         >
           {" "}
-         
           <h3>Website Visits</h3>
           <Chart
             options={websiteVisitsOptions}
