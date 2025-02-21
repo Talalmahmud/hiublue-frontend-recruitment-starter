@@ -17,57 +17,13 @@ import {
   Tab,
   TablePagination,
   Stack,
+  Select,
+  MenuItem,
+  InputLabel,
 } from "@mui/material";
 import Image from "next/image";
+import FormControl from "@mui/material/FormControl";
 
-// Sample data for the table
-// const rows = [
-//   {
-//     name: "Jayvion Simon",
-//     email: "namie.abernathy70@yahoo.com",
-//     phone: "365-374-4961",
-//     company: "Lueliwitz and Sons",
-//     jobTitle: "CEO",
-//     type: "Monthly",
-//     status: "Accepted",
-//   },
-//   {
-//     name: "Jayvion Simon",
-//     email: "namie.abernathy70@yahoo.com",
-//     phone: "365-374-4961",
-//     company: "Lueliwitz and Sons",
-//     jobTitle: "CEO",
-//     type: "Yearly",
-//     status: "Rejected",
-//   },
-//   {
-//     name: "Jayvion Simon",
-//     email: "namie.abernathy70@yahoo.com",
-//     phone: "365-374-4961",
-//     company: "Lueliwitz and Sons",
-//     jobTitle: "CEO",
-//     type: "Monthly",
-//     status: "Pending",
-//   },
-//   {
-//     name: "Jayvion Simon",
-//     email: "namie.abernathy70@yahoo.com",
-//     phone: "365-374-4961",
-//     company: "Lueliwitz and Sons",
-//     jobTitle: "CEO",
-//     type: "Pay As You Go",
-//     status: "Accepted",
-//   },
-//   {
-//     name: "Jayvion Simon",
-//     email: "namie.abernathy70@yahoo.com",
-//     phone: "365-374-4961",
-//     company: "Lueliwitz and Sons",
-//     jobTitle: "CEO",
-//     type: "Monthly",
-//     status: "Accepted",
-//   },
-// ];
 type Props = {
   rows: any;
   rowsPerPage: any;
@@ -75,6 +31,12 @@ type Props = {
   page: any;
   setPage: any;
   total: number | 0;
+  search: any;
+  setSearch: any;
+  searchType: any;
+  setSearchType: any;
+  status: any;
+  setStatus: any;
 };
 
 const OfferList = ({
@@ -84,35 +46,27 @@ const OfferList = ({
   page,
   setPage,
   total,
+  search,
+  setSearch,
+  searchType,
+  setSearchType,
+  status,
+  setStatus,
 }: Props) => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [tabValue, setTabValue] = useState("all"); // State for tab value
 
   // Handle pagination change
 
   // Handle search input change
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+    setSearch(event.target.value);
   };
 
-  // Handle tab change
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setTabValue(newValue);
-    setPage(1); // Reset to the first page when switching tabs
+    setStatus(newValue === "all" ? "" : newValue);
+    setPage(1);
   };
-
-  // Filter rows based on search term and tab value
-  const filteredRows = rows
-    ?.filter((row: any) =>
-      row?.user_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    ?.filter((row: any) => tabValue === "all" || row.status === "Accepted");
-
-  // Paginate rows
-  //   const rows = filteredRows?.slice(
-  //     (page) * rowsPerPage,
-  //     page * rowsPerPage
-  //   );
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -126,7 +80,7 @@ const OfferList = ({
   };
   return (
     <Box sx={{ padding: "20px" }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h6" gutterBottom>
         Offer List
       </Typography>
 
@@ -141,14 +95,34 @@ const OfferList = ({
       </Tabs>
 
       {/* Search Input */}
-      <TextField
-        label="Search..."
-        variant="outlined"
-        fullWidth
-        sx={{ marginBottom: "20px" }}
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyItems={"center"}
+        gap={4}
+      >
+        <TextField
+          label="Search..."
+          variant="outlined"
+          sx={{ width: "505px", marginBottom: "20px" }}
+          value={search}
+          onChange={handleSearchChange}
+        />
+        <FormControl sx={{ width: "200px" }}>
+          <InputLabel id="age-label">Age</InputLabel>
+          <Select
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value)}
+            size="medium"
+            labelId="age-label"
+            label="Age"
+            sx={{ height: "56px" }}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="yearly">Yearly</MenuItem>
+            <MenuItem value="monthly">Monthly</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
 
       {/* Table */}
       <TableContainer component={Paper}>
@@ -167,7 +141,14 @@ const OfferList = ({
           <TableBody>
             {rows.map((row: any, index: number) => (
               <TableRow key={index}>
-                <TableCell>{row.user_name}</TableCell>
+                <TableCell>
+                  <Typography variant="body1" fontWeight={600}>
+                    {row.user_name}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {row.email}
+                  </Typography>
+                </TableCell>
                 <TableCell>{row.phone}</TableCell>
                 <TableCell>{row.company}</TableCell>
                 <TableCell>{row.jobTitle}</TableCell>
@@ -176,16 +157,31 @@ const OfferList = ({
                   <Typography
                     sx={{
                       color:
-                        row.status === "Accepted"
-                          ? "green"
-                          : row.status === "Rejected"
-                          ? "red"
-                          : "orange",
+                        row.status === "accepted"
+                          ? "#118D57"
+                          : row.status === "rejected"
+                          ? "#842029"
+                          : "#664D03",
+                      backgroundColor:
+                        row.status === "accepted"
+                          ? "#D1E7DD" // Light green
+                          : row.status === "rejected"
+                          ? "#F8D7DA" // Light red
+                          : "#FFF3CD", // Light orange
+                      padding: "4px 12px",
+                      borderRadius: "8px",
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      display: "inline-block",
+                      textAlign: "center",
+                      minWidth: "80px",
+                      textTransform: "capitalize",
                     }}
                   >
                     {row.status}
                   </Typography>
                 </TableCell>
+
                 <TableCell>
                   <Stack direction="row" gap={2}>
                     {" "}
