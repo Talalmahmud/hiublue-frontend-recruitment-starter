@@ -70,7 +70,7 @@ export default function SignIn() {
   const { token } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent page reload
+    event.preventDefault();
 
     try {
       const response = await fetch("https://dummy-1.hiublue.com/api/login", {
