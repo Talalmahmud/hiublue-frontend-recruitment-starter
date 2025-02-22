@@ -3,6 +3,7 @@
 import React from "react";
 import { Box, Stack } from "@mui/material";
 import Navbar from "@/sections/dashboard/Navbar";
+import TopNav from "@/sections/dashboard/TopNav";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -19,6 +20,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           height: "100vh",
         }}
       >
+        <TopNav />
         {children}
       </Box>
     </Stack>
