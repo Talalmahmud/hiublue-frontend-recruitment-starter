@@ -166,7 +166,7 @@ export default function DashboardView() {
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        <TopNav />
+        
         <Stack
           direction="row"
           alignItems="center"

@@ -32,9 +32,8 @@ const CreateOfferForm = () => {
   const [expired, setExpired] = useState("2023-05-03");
   const [price, setPrice] = useState("");
 
-
-  const [page, setPage] = useState(1); 
-  const [hasMore, setHasMore] = useState(true); 
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   // State for validation errors
   const [errors, setErrors] = useState({
@@ -184,7 +183,16 @@ const CreateOfferForm = () => {
   }, [auth, router]);
 
   return (
-    <Box sx={{ maxWidth: "500px", margin: "0 auto", padding: "20px" }}>
+    <Box
+      sx={{
+        maxWidth: "500px",
+        margin: "0 auto",
+        padding: "20px",
+        boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.1)",
+        borderRadius: "8px",
+        mt: 6,
+      }}
+    >
       <Typography variant="h4" gutterBottom>
         Create Offer
       </Typography>
@@ -344,9 +352,19 @@ const CreateOfferForm = () => {
         />
 
         {/* Submit Button */}
-        <Button type="submit" variant="contained" color="secondary">
-          Send Offer
-        </Button>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              backgroundColor: "black",
+              "&:hover": { backgroundColor: "#333" },
+              height: 48,
+            }}
+          >
+            Send Offer
+          </Button>
+        </Box>
       </form>
     </Box>
   );
