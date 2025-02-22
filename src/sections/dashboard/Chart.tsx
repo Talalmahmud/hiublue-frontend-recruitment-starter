@@ -66,16 +66,21 @@ const Charts = ({ apiResponse }: Props) => {
       colors: ["transparent"],
     },
     xaxis: {
-      categories: categories,
+      categories: categories.map((day) => day.slice(0, 3)),
       axisTicks: {
         show: false,
       },
+      labels: {
+        rotate: 0, // Set rotation to 0 degrees (straight)
+        style: {
+          fontSize: "12px", // Optional: Adjust font size if needed
+        },
+      },
     },
-
     fill: {
       opacity: 1,
     },
-    colors: ["#3b82f6", "#10b981"],
+    colors: ["#007867", "#FFAB00"],
     legend: {
       position: "top",
       horizontalAlign: "right",
@@ -91,16 +96,16 @@ const Charts = ({ apiResponse }: Props) => {
     },
     stroke: {
       curve: "smooth",
-      width: 2,
+      width: 3,
     },
     xaxis: {
-      categories: categories, // Days of the week
+      categories: categories.map((day) => day.slice(0, 3)),
+      axisTicks: {
+        show: false,
+      },
     },
 
-    colors: ["#ef4444"],
-    markers: {
-      size: 5,
-    },
+    colors: ["#1C252E"],
   };
 
   return (
@@ -110,6 +115,7 @@ const Charts = ({ apiResponse }: Props) => {
           display: "flex",
           flexDirection: { xs: "column", md: "row" }, // Column on small screens, row on medium+
           gap: "20px",
+          width: "100%", // Ensure the container takes full width
         }}
       >
         <Box
@@ -118,35 +124,33 @@ const Charts = ({ apiResponse }: Props) => {
             boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
             borderRadius: "16px",
             padding: "24px",
+            width: "100%", // Ensure the Box takes full width
           }}
         >
-          {" "}
           <h3>Website Visits</h3>
           <Chart
             options={websiteVisitsOptions}
             series={websiteVisitsSeries}
             type="bar"
-            height={416}
+            height={318}
           />
         </Box>
 
         <Box
-          borderRadius={"card"}
           sx={{
             flex: 1,
             boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
             borderRadius: "16px",
             padding: "24px",
+            width: "100%", // Ensure the Box takes full width
           }}
         >
-          {" "}
-          {/* Each chart takes equal width */}
           <h3>Offers Sent</h3>
           <Chart
             options={offersSentOptions}
             series={offersSentSeries}
             type="line"
-            height={416}
+            height={318}
           />
         </Box>
       </Box>
