@@ -1,19 +1,8 @@
 "use client";
 
 import React from "react";
-import {
-  Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import Link from "next/link";
-import Image from "next/image";
-import Navbar from "@/sections/dashboard/NavBar";
+import { Box, Stack } from "@mui/material";
+import Navbar from "@/sections/dashboard/Navbar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
