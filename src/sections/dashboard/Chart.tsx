@@ -54,7 +54,7 @@ const Charts = ({ apiResponse }: Props) => {
       bar: {
         horizontal: false,
         columnWidth: "55%",
-        borderRadius: 12,
+        borderRadius: 4,
       },
     },
     dataLabels: {
@@ -62,7 +62,7 @@ const Charts = ({ apiResponse }: Props) => {
     },
     stroke: {
       show: true,
-      width: 2,
+      width: 1,
       colors: ["transparent"],
     },
     xaxis: {
@@ -104,12 +104,11 @@ const Charts = ({ apiResponse }: Props) => {
   };
 
   return (
-    <Stack sx={{ maxWidth: "100%", margin: "0 auto", padding: "20px" }}>
+    <Stack sx={{ padding: "20px" }}>
       <Box
         sx={{
           display: "flex",
           flexDirection: { xs: "column", md: "row" }, // Column on small screens, row on medium+
-
           gap: "20px",
         }}
       >
@@ -127,7 +126,7 @@ const Charts = ({ apiResponse }: Props) => {
             options={websiteVisitsOptions}
             series={websiteVisitsSeries}
             type="bar"
-            height={350}
+            height={416}
           />
         </Box>
 
@@ -147,7 +146,7 @@ const Charts = ({ apiResponse }: Props) => {
             options={offersSentOptions}
             series={offersSentSeries}
             type="line"
-            height={350}
+            height={416}
           />
         </Box>
       </Box>

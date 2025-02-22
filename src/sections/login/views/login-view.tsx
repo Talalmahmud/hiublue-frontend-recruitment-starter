@@ -90,14 +90,14 @@ export default function SignIn() {
       setToken(data.token); // Store token in context & localStorage
       localStorage.setItem("token", JSON.stringify(data.token)); // Persist token
 
-      router.push("/"); // Redirect to home page after successful login
+      router.push("/dashboard"); // Redirect to home page after successful login
     } catch (err: any) {
       setError(err.message); // Show error message
     }
   };
   useEffect(() => {
     if (token !== "") {
-      router.push("/");
+      router.push("/dashboard");
     }
   }, []);
 

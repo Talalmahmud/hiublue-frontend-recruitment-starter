@@ -185,7 +185,7 @@ export default function DashboardView() {
         </Stack>
 
         <Box sx={{ mt: 4 }}>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={3}>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
             <Card
               sx={{
                 flex: 1,

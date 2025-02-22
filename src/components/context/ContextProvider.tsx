@@ -42,15 +42,16 @@ export const AuthProvider = ({ children }: Children) => {
   useEffect(() => {
     if (token === null) return; // Prevent redirect before token is initialized
 
-    // Define routes that are allowed even when the user is authenticated
-    const allowedRoutes = ["/onboarding", "/login"]; // Add more routes if needed
-
     if (token !== "") {
       // If the user is authenticated and tries to access a restricted route, redirect to "/"
-
+      if (pathname == "/") {
+        router.push("/dashboard");
+      }
+      if (pathname == "/login") {
+        router.push("/dashboard");
+      }
       router.push(pathname);
     } else {
-      // If the user is not authenticated, redirect to "/login"
       router.push("/login");
     }
   }, [token, router, pathname]); // Add pathname to the dependency array
