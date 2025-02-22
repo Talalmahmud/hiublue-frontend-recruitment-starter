@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import Charts from "../Chart";
 import OfferList from "../UserTable";
 import { useRouter } from "next/navigation";
+import TopNav from "../TopNav";
 
 export default function DashboardView() {
   const auth = useAuth();
@@ -164,11 +165,14 @@ export default function DashboardView() {
 
   return (
     <>
-      <Box sx={{ flexGrow: 1, padding: 3 }}>
+      <Box sx={{ flexGrow: 1 }}>
+        <TopNav />
         <Stack
           direction="row"
           alignItems="center"
           justifyContent={"space-between"}
+          mt={2}
+          p={3}
         >
           <Typography variant="h4" gutterBottom>
             Dashboard
@@ -184,7 +188,7 @@ export default function DashboardView() {
           </Select>
         </Stack>
 
-        <Box sx={{ mt: 4 }}>
+        <Box sx={{ mt: 4, px: 3 }}>
           <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
             <Card
               sx={{
