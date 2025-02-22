@@ -126,7 +126,7 @@ const OfferList = ({
 
       {/* Table */}
       <TableContainer component={Paper}>
-        <Table>
+        <Table sx={{ paddingY: "10px" }}>
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
@@ -161,7 +161,7 @@ const OfferList = ({
                           ? "#118D57"
                           : row.status === "rejected"
                           ? "#842029"
-                          : "#664D03",
+                          : "#B76E00",
                       backgroundColor:
                         row.status === "accepted"
                           ? "#D1E7DD" // Light green

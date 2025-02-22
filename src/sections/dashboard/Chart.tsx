@@ -67,18 +67,11 @@ const Charts = ({ apiResponse }: Props) => {
     },
     xaxis: {
       categories: categories,
-    },
-    yaxis: {
-      title: {
-        text: "Visits",
-      },
-      labels: {
-        align: "left", // Align y-axis labels to the left
-      },
-      axisBorder: {
-        show: true, // Show y-axis border
+      axisTicks: {
+        show: false,
       },
     },
+
     fill: {
       opacity: 1,
     },
@@ -103,11 +96,7 @@ const Charts = ({ apiResponse }: Props) => {
     xaxis: {
       categories: categories, // Days of the week
     },
-    yaxis: {
-      title: {
-        text: "Offers Sent",
-      },
-    },
+
     colors: ["#ef4444"],
     markers: {
       size: 5,
