@@ -114,12 +114,6 @@ const CreateOfferForm = () => {
     setErrors((prev) => ({ ...prev, additions: false }));
   };
 
-  // Handle user change
-  const handleUserChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setUser(event.target.value as string);
-    setErrors((prev) => ({ ...prev, user: false }));
-  };
-
   useEffect(() => {
     getUsers();
     if (!auth.token) {
