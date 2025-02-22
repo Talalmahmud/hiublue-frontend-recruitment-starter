@@ -27,10 +27,14 @@ const CreateOfferForm = () => {
 
   const [planType, setPlanType] = useState("monthly");
   const [additions, setAdditions] = useState(["refundable"]);
-  const [userList, setUserList] = useState<any>([]); // Default to empty
-  const [user, setUser] = useState<number | null>(null); // Default to empty
+  const [userList, setUserList] = useState<any>([]); // List of users
+  const [user, setUser] = useState<number | null>(null); // Selected user
   const [expired, setExpired] = useState("2023-05-03");
   const [price, setPrice] = useState("");
+
+
+  const [page, setPage] = useState(1); 
+  const [hasMore, setHasMore] = useState(true); 
 
   // State for validation errors
   const [errors, setErrors] = useState({
@@ -41,11 +45,12 @@ const CreateOfferForm = () => {
     price: false,
   });
 
-  const getUsers = async () => {
+  // Fetch users with pagination
+  const getUsers = async (page: number) => {
     if (auth.token !== "") {
       try {
         const res = await fetch(
-          "https://dummy-1.hiublue.com/api/users?page=1&per_page=200",
+          `https://dummy-1.hiublue.com/api/users?page=${page}&per_page=20`, // Fetch 20 users per page
           {
             method: "GET",
             headers: {
@@ -60,15 +65,38 @@ const CreateOfferForm = () => {
         }
 
         const data = await res.json();
-        setUserList(data.data);
+        if (data.data.length === 0) {
+          setHasMore(false); // No more users to load
+        } else {
+          setUserList((prev: any) => [...prev, ...data.data]); // Append new users
+        }
       } catch (error) {
         console.error("Error fetching users:", error);
       }
     }
   };
 
+  // Load more users when scrolling to the bottom
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const listboxNode = event.currentTarget;
+    if (
+      listboxNode.scrollTop + listboxNode.clientHeight ===
+      listboxNode.scrollHeight
+    ) {
+      if (hasMore) {
+        setPage((prev) => prev + 1); // Increment page to fetch more users
+      }
+    }
+  };
+
+  // Fetch users on component mount and when page changes
   useEffect(() => {
-    if (userList.length > 0) {
+    getUsers(page);
+  }, [page]);
+
+  // Set the first user as default when userList is populated
+  useEffect(() => {
+    if (userList.length > 0 && user === null) {
       setUser(userList[0].id);
     }
   }, [userList]);
@@ -95,14 +123,14 @@ const CreateOfferForm = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth.token}`, // Pass token in headers
+            Authorization: `Bearer ${auth.token}`,
           },
           body: JSON.stringify({
             plan_type: planType,
             additions: additions,
             user_id: user,
             expired: expired,
-            price: parseFloat(price), // Convert price to a number
+            price: parseFloat(price),
           }),
         });
 
@@ -112,11 +140,9 @@ const CreateOfferForm = () => {
 
         const data = await response.json();
         console.log("Offer created successfully:", data);
-
-        // Show success message
         alert("Offer submitted successfully!");
 
-        // Optionally, reset the form or redirect the user
+        // Reset form
         setPlanType("monthly");
         setAdditions(["refundable"]);
         setUser(null);
@@ -151,7 +177,7 @@ const CreateOfferForm = () => {
 
   // Fetch users on component mount
   useEffect(() => {
-    getUsers();
+    getUsers(1); // Fetch first page
     if (!auth.token) {
       router.push("/login");
     }
@@ -175,12 +201,7 @@ const CreateOfferForm = () => {
               value="pay_as_you_go"
               control={
                 <Radio
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green", // Checked color
-                    },
-                  }}
+                  sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                 />
               }
               label="Pay As You Go"
@@ -189,12 +210,7 @@ const CreateOfferForm = () => {
               value="monthly"
               control={
                 <Radio
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green", // Checked color
-                    },
-                  }}
+                  sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                 />
               }
               label="Monthly"
@@ -203,12 +219,7 @@ const CreateOfferForm = () => {
               value="yearly"
               control={
                 <Radio
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green", // Checked color
-                    },
-                  }}
+                  sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                 />
               }
               label="Yearly"
@@ -229,12 +240,7 @@ const CreateOfferForm = () => {
                   checked={additions.includes("refundable")}
                   onChange={handleAdditionsChange}
                   value="refundable"
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green", // Checked color
-                    },
-                  }}
+                  sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                 />
               }
               label="Refundable"
@@ -245,12 +251,7 @@ const CreateOfferForm = () => {
                   checked={additions.includes("on_demand")}
                   onChange={handleAdditionsChange}
                   value="on_demand"
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green", // Checked color
-                    },
-                  }}
+                  sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                 />
               }
               label="On Demand"
@@ -261,12 +262,7 @@ const CreateOfferForm = () => {
                   checked={additions.includes("negotiable")}
                   onChange={handleAdditionsChange}
                   value="negotiable"
-                  sx={{
-                    color: "green",
-                    "&.Mui-checked": {
-                      color: "green", // Checked color
-                    },
-                  }}
+                  sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                 />
               }
               label="Negotiable"
@@ -289,14 +285,15 @@ const CreateOfferForm = () => {
           <Select
             labelId="user-select-label"
             id="user-select"
-            value={user || ""} // Controlled value (use empty string as fallback)
+            value={user || ""}
             label="User"
-            onChange={(e) => setUser(Number(e.target.value))} // Update state on change
+            onChange={(e) => setUser(Number(e.target.value))}
             MenuProps={{
               PaperProps: {
+                onScroll: handleScroll, // Handle scroll event
                 style: {
-                  maxHeight: 200, // Set the maximum height of the dropdown
-                  overflow: "auto", // Enable scrolling
+                  maxHeight: 200,
+                  overflow: "auto",
                 },
               },
             }}
@@ -306,6 +303,7 @@ const CreateOfferForm = () => {
                 {user.name}
               </MenuItem>
             ))}
+            {hasMore && <MenuItem disabled>Loading more users...</MenuItem>}
           </Select>
           {errors.user && (
             <FormHelperText>Please select a user.</FormHelperText>
@@ -326,9 +324,6 @@ const CreateOfferForm = () => {
           sx={{ marginBottom: "20px" }}
           error={errors.expired}
           helperText={errors.expired ? "Expired date is required." : ""}
-          InputLabelProps={{
-            shrink: true,
-          }}
         />
 
         {/* Price */}
