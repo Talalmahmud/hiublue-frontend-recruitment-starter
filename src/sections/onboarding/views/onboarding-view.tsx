@@ -16,6 +16,7 @@ import {
   MenuItem,
   InputLabel,
   Checkbox,
+  FormGroup,
 } from "@mui/material";
 import { useAuth } from "@/components/context/ContextProvider";
 import { useRouter } from "next/navigation";
@@ -24,12 +25,10 @@ const CreateOfferForm = () => {
   const auth = useAuth();
   const router = useRouter();
 
-  // State for form fields
   const [planType, setPlanType] = useState("monthly");
   const [additions, setAdditions] = useState(["refundable"]);
   const [userList, setUserList] = useState<any>([]); // Default to empty
-
-  const [user, setUser] = useState(""); // Default to empty
+  const [user, setUser] = useState<number | null>(null); // Default to empty
   const [expired, setExpired] = useState("2023-05-03");
   const [price, setPrice] = useState("");
 
@@ -42,46 +41,47 @@ const CreateOfferForm = () => {
     price: false,
   });
 
-  // Sample list of users
-
   const getUsers = async () => {
     if (auth.token !== "") {
       try {
         const res = await fetch(
           "https://dummy-1.hiublue.com/api/users?page=1&per_page=200",
-
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${auth.token}`, // Pass token in headers
+              Authorization: `Bearer ${auth.token}`,
             },
           }
         );
 
         if (!res.ok) {
-          throw new Error("Failed to fetch summary data");
+          throw new Error("Failed to fetch users");
         }
 
         const data = await res.json();
-        // console.log(data);
         setUserList(data.data);
-        return data;
       } catch (error) {
-        console.error("Error fetching summary data:", error);
+        console.error("Error fetching users:", error);
       }
     }
   };
 
+  useEffect(() => {
+    if (userList.length > 0) {
+      setUser(userList[0].id);
+    }
+  }, [userList]);
+
   // Handle form submission
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     // Validate form fields
     const newErrors = {
       planType: !planType,
       additions: additions.length === 0,
-      user: !user.trim(),
+      user: user === null,
       expired: !expired.trim(),
       price: !price.trim() || isNaN(Number(price)),
     };
@@ -90,8 +90,43 @@ const CreateOfferForm = () => {
 
     // If no errors, submit the form
     if (!Object.values(newErrors).some((error) => error)) {
-      alert("Offer submitted successfully!");
-      // You can add your form submission logic here
+      try {
+        const response = await fetch("https://dummy-1.hiublue.com/api/offers", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`, // Pass token in headers
+          },
+          body: JSON.stringify({
+            plan_type: planType,
+            additions: additions,
+            user_id: user,
+            expired: expired,
+            price: parseFloat(price), // Convert price to a number
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to create offer");
+        }
+
+        const data = await response.json();
+        console.log("Offer created successfully:", data);
+
+        // Show success message
+        alert("Offer submitted successfully!");
+
+        // Optionally, reset the form or redirect the user
+        setPlanType("monthly");
+        setAdditions(["refundable"]);
+        setUser(null);
+        setExpired("2023-05-03");
+        setPrice("");
+        router.push("/dashboard");
+      } catch (error) {
+        console.error("Error creating offer:", error);
+        alert("Failed to create offer. Please try again.");
+      }
     }
   };
 
@@ -114,6 +149,7 @@ const CreateOfferForm = () => {
     setErrors((prev) => ({ ...prev, additions: false }));
   };
 
+  // Fetch users on component mount
   useEffect(() => {
     getUsers();
     if (!auth.token) {
@@ -136,7 +172,7 @@ const CreateOfferForm = () => {
           <FormLabel component="legend">Plan Type</FormLabel>
           <RadioGroup row value={planType} onChange={handlePlanTypeChange}>
             <FormControlLabel
-              value="pay-as-you-go"
+              value="pay_as_you_go"
               control={
                 <Radio
                   sx={{
@@ -186,11 +222,13 @@ const CreateOfferForm = () => {
         {/* Additions */}
         <FormControl component="fieldset" sx={{ marginBottom: "20px" }}>
           <FormLabel component="legend">Additions</FormLabel>
-          <RadioGroup row value={additions} onChange={handleAdditionsChange}>
+          <FormGroup row>
             <FormControlLabel
-              value="refundable"
               control={
                 <Checkbox
+                  checked={additions.includes("refundable")}
+                  onChange={handleAdditionsChange}
+                  value="refundable"
                   sx={{
                     color: "green",
                     "&.Mui-checked": {
@@ -202,9 +240,11 @@ const CreateOfferForm = () => {
               label="Refundable"
             />
             <FormControlLabel
-              value="on-demand"
               control={
                 <Checkbox
+                  checked={additions.includes("on_demand")}
+                  onChange={handleAdditionsChange}
+                  value="on_demand"
                   sx={{
                     color: "green",
                     "&.Mui-checked": {
@@ -216,9 +256,11 @@ const CreateOfferForm = () => {
               label="On Demand"
             />
             <FormControlLabel
-              value="negotiable"
               control={
                 <Checkbox
+                  checked={additions.includes("negotiable")}
+                  onChange={handleAdditionsChange}
+                  value="negotiable"
                   sx={{
                     color: "green",
                     "&.Mui-checked": {
@@ -229,7 +271,7 @@ const CreateOfferForm = () => {
               }
               label="Negotiable"
             />
-          </RadioGroup>
+          </FormGroup>
           {errors.additions && (
             <FormHelperText error>
               Please select at least one addition.
@@ -247,9 +289,9 @@ const CreateOfferForm = () => {
           <Select
             labelId="user-select-label"
             id="user-select"
-            value={user}
+            value={user || ""} // Controlled value (use empty string as fallback)
             label="User"
-            onChange={(e) => setUser(e.target.value)}
+            onChange={(e) => setUser(Number(e.target.value))} // Update state on change
             MenuProps={{
               PaperProps: {
                 style: {
@@ -284,6 +326,9 @@ const CreateOfferForm = () => {
           sx={{ marginBottom: "20px" }}
           error={errors.expired}
           helperText={errors.expired ? "Expired date is required." : ""}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
 
         {/* Price */}
