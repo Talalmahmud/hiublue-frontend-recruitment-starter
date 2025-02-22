@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -62,12 +62,10 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 
 export default function SignIn() {
   const router = useRouter();
-  const { setToken } = useAuth(); // Get setToken from Auth Context
+  const { token, setToken } = useAuth(); // Get setToken from Auth Context
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  const { token } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -96,10 +94,10 @@ export default function SignIn() {
     }
   };
   useEffect(() => {
-    if (token !== "") {
-      router.push("/dashboard");
+    if (token) {
+      redirect("/dashboard");
     }
-  }, []);
+  }, [token, router]); // Include router in dependency array
 
   return (
     <>
